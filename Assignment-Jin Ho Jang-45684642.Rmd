@@ -1,0 +1,222 @@
+---
+title: "Assessment Jin Ho Jang 45684642"
+author: "Jin Ho Jang"
+date: '2021 5 28 '
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 1
+
+```{r read_surg}
+surg = read.table("surg.dat", header = TRUE)
+```
+
+## a)
+
+Since gender is a categorical variable, its distribution is not affected on the scatterplot.
+
+### Subset surg1
+```{r create_subset1}
+surg1 = subset(surg, select = -c(gender))
+```
+
+### Plot surg1
+```{r plot_surg}
+plot(surg1, panel = panel.smooth)
+```
+
+We can see they are less likely related.
+Red lines of each scatterplot show the trend between each variable.
+Overall, the variables are not likely related to each other, but there is a little linear relationship between survival and other factors.
+
+## b)
+
+### Find correlation
+```{r correlation}
+cor(surg1)
+```
+
+Compare to other pairs of variables, survival's absolute value of coefficients are greater. 
+Thus, we can assume that there is a linear reationship between survival and other variables, except age.
+
+# c)
+
+### Fitting the model
+```{r linear model}
+surg1.lm = lm(survival ~ blood + prognosis + enzyme + liver + age, data = surg1)
+```
+
+### Create summary of data
+```{r summary}
+summary(surg1.lm)
+```
+
+### Now we can make multiple linear regression model equation
+Ysurvival = -1179.366654 + 86.630445*Blood + 8.501113*prognosis + 11.124165*enzyme + 38.553562*liver -2.339958*age
+
+### Hypothesis
+$H_{0}$ = $\beta b_{1}$	 = $\beta b_{2}$ = $\beta b_{3}$ = $\beta b_{4}$ = $\beta b_{5}$ = 0 
+
+  $H_{1}$ = $\beta b_{i}$ =/ 0 : At least one of the beta is not zero, where $\beta B$ is the degree of change in the outcome variable for every 1-unit of change in the predictor variable. 
+
+### Creating ANOVA table
+```{r anova surg1}
+anova(surg1.lm)
+```
+Since the p-value of liver and age are greater than signficant level (0.05), we can conclude that these two predictors are not significant in this model
+
+Based on p-value, liver and age are not significant predictor in this model.
+
+### Compute F statisc
+```{r Full RegS.S} 
+1005152 + 1278496 + 3442172 + 57862 + 33032
+```
+### Compute Regulation
+```{r RegM.S.}
+5816714/5
+```
+### F Statistics: Fobs = RegS.S / Reg M.S.
+```{r Fstatistics}
+1163342.8/53183
+```
+### Null distribution: Residuals are normally distributed
+
+### P-Value: P(F5,48 >/ 21.874) = 
+```{r p value}
+1 - pf(21.874335784, df1=5, df2=48)
+```
+### Conclusion
+P-Value of liver and age > 0, hence they are not significant to this model.
+P-value of the test was 2.385625e-11 < 0.01
+There is a significant linear relationship between survival and at least one of the five predictor variables.
+ 
+## d)
+
+Drop liver and age since the p-values of them are greater than 0.05.
+
+### So perform new linear regression.
+```{r new lm}
+surg1.lm1 = lm(survival ~ blood + prognosis + enzyme, data = surg)
+```
+
+### Find the coefficients for each variables
+```{r coeff}
+coefficients(surg1.lm1)
+```
+### Multiple regression model
+$\gamma_{sur}$ = -1410.846901 + 101.053887*blood + 9.381966*prognosis + 12.127807*enzyme
+
+## e)
+
+Intuitively, time cannot be negative, but there is a possibility for survival time to be less than 0 in this linear regression model.
+
+### Check qq plot and residual plot
+```{r plots}
+par(mfrow = c(1,2))
+qqnorm(surg1.lm1$residuals, main = "Normal Q-Q plot of residuals")
+plot(surg1.lm1$fitted.values, surg1.lm$residuals, main = "Residuals vs Fitted", xlab = "Fitted", ylab = "Residuals")
+```
+
+The qqplot shows that there is a problem with the normality of residuals since there is no linear trend in the plot.
+The residuals vs Fitted plot shows some clusters.
+Hence we can conclude that this model is not appropriate for this research.
+
+## f)
+
+### Re-fit the model
+```{r logmodel}
+surg.log = lm(log(survival) ~ blood + prognosis + enzyme + liver + age + gender, data = surg)
+```
+
+### Create summary
+```{r logsummary}
+summary(surg.log)
+```
+
+### The new multiple linear regression equation is
+$\gamma_{log.sur}$ = 4.100996997  + 0.094858430*blood + 0.013019518*prognosis + 0.016245445*enzyme - 0.003132326*liver - 0.004863398*age - 0.066139894*gender
+
+Since the p values of liver, age, gender are greater than the significance level, hence we can drop those variables.
+
+### The final multiple regression equation is
+$\gamma_{log.sur2}$ = 4.100996997 + 0.094858430*blood + 0.013019518*prognosis + 0.016245445*enzyme
+
+## g)
+
+### Observe the QQplot and residual vs fitted plot
+```{r new_plots}
+par(mfrow = c(1,2))
+qqnorm(surg.log$residuals, main = "Normal Q-Q plot of residuals")
+plot(surg.log$fitted.values, surg.log$residuals, main = "Residuals vs Fitted", xlab = "Fitted", ylab = "Residuals")
+```
+
+QQ plot shows the linear trend which shows the normality of this model is valid.
+Residuals are more scattered even though there is an outlier existing.
+Hence, compared to the previous model, the regression model with log(survival) response variable is superior to the model with the survival response variable. 
+
+
+# Question 2
+
+```{r read_file}
+kml = read.table("kml.dat", header = TRUE)
+```
+
+## a)
+
+### Subsets kml1 & kml2
+```{r subset}
+kml1 = subset(kml, select = -c(kmL))
+kml2 = table(kml1[, c("driver","car")])
+```
+
+We can observe it has equal group size. Therefore, this study is balanced
+
+## b)
+
+### Intersection plot
+```{r interactionplot}
+with(kml, interaction.plot(driver, car, kmL, trace.label = "car type", xlab = "driver type", ylab = "kmL", col = 1:3))
+```
+
+There is no such interaction between each variables because the lines are parallel on the plot
+
+### Boxplot
+```{r boxplot}
+boxplot(kmL ~ driver + car, data = kml)
+```
+
+The boxplots are scattered apart, so there is variability. Hence, there is no dependencies between the variables. By preliminary observation, we could observe that there are variabilities and no interaction between each variable. Hence there is no correlation between driver and production variation (car type).
+
+### Linear model
+```{r linear_model}
+kml3 = lm(kmL ~ driver * car, data = kml)
+summary(kml3)
+```
+
+Based on the regression model, we could find that driver and car-type are significant variable in this model because their p-values are less than 0.05. 
+However, there is no such significant interaction between driver and car type to this model since their p-values are bigger than 0.05.
+
+### Create anova
+```{r anova}
+anova(kml3)
+```
+
+Based on the anova of the regression model, the p-value of car 3.664e-14 and p-value of driver 2.2e-16 are less than 0.05. 
+Hence we can conclude that the main effect of this model are significant.
+
+## c)
+
+### Hypothesis
+$H_{0}$: $y_{ij}$ = 0
+$H_{1}$: $y_{ij}$ =/ 0, at least one of interaction effect is significant.
+Assumption: Car and drivers are randomly chosen by the manufacturer.
+
+## d)
+
+Based on the anova of the regression model, we could find the p-value of car, 3.664e-14 and the p-value of driver, 2.2e-16 are less than the significance level of 0.05.
+However, there is no such significant interaction between driver and car to this model, because their p-value, 0.3715 is bigger than significance level of 0.05.
+Hence we can conclude that the main effects of this model are significant whereas, interaction between the car and the driver do not affect to the fuel efficiency.
