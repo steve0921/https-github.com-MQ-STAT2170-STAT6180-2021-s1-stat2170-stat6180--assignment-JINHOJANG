@@ -58,7 +58,7 @@ summary(surg1.lm)
 ```
 
 ### Now we can make multiple linear regression model equation
-Ysurvival = -1179.366654 + 86.630445*Blood + 8.501113*prognosis + 11.124165*enzyme + 38.553562*liver -2.339958*age
+$\gamma_{sur}$ = -1179.366654 + 86.630445*Blood + 8.501113*prognosis + 11.124165*enzyme + 38.553562*liver -2.339958*age
 
 ### Hypothesis
 $H_{0}$ = $\beta b_{1}$	 = $\beta b_{2}$ = $\beta b_{3}$ = $\beta b_{4}$ = $\beta b_{5}$ = 0 
