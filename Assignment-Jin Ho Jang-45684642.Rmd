@@ -31,6 +31,7 @@ plot(surg1, panel = panel.smooth)
 
 We can see they are less likely related.
 Red lines of each scatterplot show the trend between each variable.
+
 Overall, the variables are not likely related to each other, but there is a little linear relationship between survival and other factors.
 
 ## b)
@@ -41,6 +42,7 @@ cor(surg1)
 ```
 
 Compare to other pairs of variables, survival's absolute value of coefficients are greater. 
+
 Thus, we can assume that there is a linear reationship between survival and other variables, except age.
 
 # c)
